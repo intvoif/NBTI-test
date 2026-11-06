@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBTI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f0e7 0%, #e8dfd3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .quiz-container {
+            max-width: 640px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            box-shadow: 0 30px 45px -20px rgba(50, 30, 10, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+            padding: 32px 28px 40px;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #3b2a1c;
+            text-align: center;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .subhead {
+            text-align: center;
+            color: #6f5e4e;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 32px;
+            border-bottom: 1px dashed #cdb9a8;
+            padding-bottom: 18px;
+        }
+
+        /* 开始卡片 */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            padding: 20px 10px 10px;
+        }
+
+        .start-icon {
+            font-size: 5rem;
+            letter-spacing: -0.1em;
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.1));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .start-btn {
+            background: #4a3728;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 500;
+            padding: 18px 48px;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 15px 25px -8px #4a3728aa, 0 4px 0 0 #2d1f14 inset;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            letter-spacing: 0.5px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .start-btn:hover {
+            background: #5e4636;
+            transform: scale(1.02);
+            box-shadow: 0 18px 28px -8px #4a3728cc, 0 4px 0 0 #2d1f14 inset;
+        }
+
+        .start-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 8px 12px -6px #4a3728aa, 0 2px 0 0 #2d1f14 inset;
+        }
+
+        /* 问题区域 */
+        .quiz-screen {
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .progress {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #7a6857;
+            background: #ede5dc;
+            padding: 6px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            align-self: flex-start;
+            letter-spacing: 0.3px;
+        }
+
+        .question-text {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: #2f241b;
+            line-height: 1.3;
+            margin: 12px 0 16px;
+            padding-right: 8px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #dacfc5;
+            border-radius: 100px;
+            padding: 16px 24px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #3e3024;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover {
+            background: #fcf7f2;
+            border-color: #b7a18f;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 16px -10px rgba(70, 50, 30, 0.2);
+        }
+
+        .option-btn.selected {
+            background: #4a3728;
+            border-color: #4a3728;
+            color: white;
+            box-shadow: 0 12px 18px -10px #4a3728;
+        }
+
+        .option-btn.selected .option-prefix {
+            background: #ffffff30;
+            color: white;
+        }
+
+        .option-prefix {
+            background: #e9dfd6;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #4a3728;
+            transition: background 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .next-btn {
+            background: #4a3728;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 8px 16px -6px #4a3728aa, 0 3px 0 0 #2d1f14 inset;
+            transition: all 0.1s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .next-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #b1a294;
+            box-shadow: 0 8px 16px -6px #b1a294, 0 3px 0 0 #7d6b5c inset;
+            transform: none;
+        }
+
+        .next-btn:not(:disabled):hover {
+            background: #5e4636;
+            transform: scale(1.02);
+        }
+
+        .next-btn:not(:disabled):active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 8px -4px #4a3728aa, 0 1px 0 0 #2d1f14 inset;
+        }
+
+        /* 结果区域 */
+        .result-screen {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px 10px 10px;
+        }
+
+        .result-emoji {
+            font-size: 6rem;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.1));
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2f241b;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .result-desc {
+            font-size: 1.2rem;
+            color: #4f3e30;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            background: #ffffffb0;
+            padding: 20px 24px;
+            border-radius: 32px;
+            border: 1px solid #e1d5ca;
+            max-width: 460px;
+        }
+
+        .restart-btn {
+            background: transparent;
+            border: 2px solid #4a3728;
+            color: #4a3728;
+            padding: 14px 40px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            margin-top: 8px;
+        }
+
+        .restart-btn:hover {
+            background: #4a3728;
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px -10px #4a3728;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 小屏适配 */
+        @media (max-width: 480px) {
+            .quiz-container {
+                padding: 24px 18px 32px;
+                border-radius: 36px;
+            }
+            h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.4rem; }
+            .option-btn { font-size: 1rem; padding: 14px 18px; }
+            .option-prefix { width: 28px; height: 28px; font-size: 0.9rem; }
+            .start-btn { font-size: 1.4rem; padding: 15px 32px; }
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-container">
+    <!-- 开始界面 -->
+    <div id="startScreen" class="start-screen">
+        <div class="start-icon">🥛</div>
+        <h1>✨ NBTI ✨</h1>
+        <div class="subhead">回答问题，看看你内心的隐藏奶格</div>
+        <button id="startBtn" class="start-btn">开始答题 →</button>
+    </div>
+
+    <!-- 答题界面：初始加 hidden 类 -->
+    <div id="quizScreen" class="quiz-screen hidden">
+        <div class="progress" id="progressText">第 1 / 4 题</div>
+        <div class="question-text" id="questionText">加载问题中...</div>
+        <div class="options" id="optionsContainer"></div>
+        <div class="nav-buttons">
+            <button id="nextBtn" class="next-btn" disabled>下一题</button>
+        </div>
+    </div>
+
+    <!-- 结果界面：初始加 hidden 类 -->
+    <div id="resultScreen" class="result-screen hidden">
+        <div class="result-emoji" id="resultEmoji">🌟</div>
+        <div class="result-title" id="resultTitle">你的结果</div>
+        <div class="result-desc" id="resultDesc"></div>
+        <button id="restartBtn" class="restart-btn">↺ 重新开始</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 定义测试数据 ----------
+        const questions = [
+            {
+                text: "你第一次见到奶龙的感想",
+                options: [
+                    { text: "好圆好萌，想捏捏它的脸", result: "奶龙" },
+                    { text: "莫名顺眼", result: "奶猫" },
+                    { text: "这啥玩意", result: "奶狗" },
+                    { text: "什么黄色外星生物入侵地球", result: "奶屎" }
+                ]
+            },
+            {
+                text: "如果有一只奶龙站在你面前你会是什么反应",
+                options: [
+                    { text: "捧腹大笑", result: "奶龙" },
+                    { text: "面露难色", result: "奶娃" },
+                    { text: "轻松绷住", result: "奶猫" },
+                    { text: "来不及了", result: "奶狗" }
+                ]
+            },
+            {
+                text: "你最想和哪只奶一起做小组作业",
+                options: [
+                    { text: "奶屎", result: "奶屎" },
+                    { text: "奶蛋", result: "奶蛋" },
+                    { text: "奶龙", result: "奶龙" },
+                    { text: "奶猫", result: "奶猫" },
+                    { text: "奶狗", result: "奶狗" },
+                    { text: "奶娃", result: "奶娃" },
+                    { text: "奶奶", result: "奶奶" }
+                ]
+            },
+            {
+                text: "如果你可以和奶龙一起过一天你会和它一起做什么",
+                options: [
+                    { text: "伪装成奶龙", result: "奶龙" },
+                    { text: "尝尝咸淡", result: "奶蛋" },
+                    { text: "和它一起跳舞", result: "奶娃" },
+                    { text: "把奶龙拿去卖了", result: "奶屎" }
+                ]
+            }
+        ];
+
+        // 每种“奶家人”结果
+        const resultMap = {
+            "奶龙": {
+                emoji: "🥛🐲",
+                title: "奶龙",
+                desc: "你就是奶龙本龙！圆滚滚、萌乎乎，自带主角光环。你乐观开朗，喜欢成为人群中的开心果，遇到事情总能一笑而过。请继续保持你的可爱与真诚！"
+            },
+            "奶猫": {
+                emoji: "🥛🐱",
+                title: "奶猫",
+                desc: "你是傲娇又黏人的奶猫。看起来高冷，其实内心柔软，喜欢被关注又不好意思直说。你有自己独特的节奏，偶尔炸毛，但更多时候让人忍不住想撸。"
+            },
+            "奶狗": {
+                emoji: "🥛🐶",
+                title: "奶狗",
+                desc: "你是热情忠诚的奶狗。对朋友掏心掏肺，永远精力充沛、摇着尾巴迎接世界。你直接又真诚，是团队里的气氛担当，偶尔有点憨，但超级可靠。"
+            },
+            "奶屎": {
+                emoji: "🥛💩",
+                title: "奶屎",
+                desc: "你是传说中的奶屎，不走寻常路。脑回路清奇，说话一针见血，擅长用幽默化解尴尬。别人笑你太疯癫，你笑别人看不穿——你是隐藏的快乐源泉。"
+            },
+            "奶蛋": {
+                emoji: "🥛🥚",
+                title: "奶蛋",
+                desc: "你是圆润温和的奶蛋。性格平和，包容力强，像一颗安静的小蛋，不争不抢却让人安心。你善于观察，总能在关键时刻给出最稳妥的建议。"
+            },
+            "奶娃": {
+                emoji: "🥛👶",
+                title: "奶娃",
+                desc: "你是天真烂漫的奶娃。好奇心旺盛，对世界充满新鲜感，喜欢撒娇也容易满足。你的纯粹和想象力是珍贵的礼物，请一直保持这份童心。"
+            },
+            "奶奶": {
+                emoji: "🥛👵",
+                title: "奶奶",
+                desc: "你是温暖睿智的奶奶。阅历丰富，心态从容，喜欢照顾身边的人。你是大家的定心丸，总能用温柔的话语和一碗热汤治愈所有人。"
+            }
+        };
+
+        // ---------- 状态管理 ----------
+        let currentQuestionIndex = 0;
+        let selectedOptionIndex = null;
+        let answers = new Array(questions.length).fill(null); // 存每题的 result 字符串
+
+        // DOM 元素
+        const startScreen = document.getElementById('startScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const startBtn = document.getElementById('startBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+
+        const progressText = document.getElementById('progressText');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+
+        const resultEmoji = document.getElementById('resultEmoji');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDesc = document.getElementById('resultDesc');
+
+        // ---------- 辅助函数 ----------
+        function resetState() {
+            currentQuestionIndex = 0;
+            selectedOptionIndex = null;
+            answers = new Array(questions.length).fill(null);
+        }
+
+        function showScreen(screen) {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+
+            if (screen === 'start') {
+                startScreen.classList.remove('hidden');
+            } else if (screen === 'quiz') {
+                quizScreen.classList.remove('hidden');
+            } else if (screen === 'result') {
+                resultScreen.classList.remove('hidden');
+            }
+        }
+
+        function updateNextButtonState() {
+            nextBtn.disabled = (selectedOptionIndex === null);
+        }
+
+        function clearSelectedStyles() {
+            const allOptionBtns = document.querySelectorAll('.option-btn');
+            allOptionBtns.forEach(btn => btn.classList.remove('selected'));
+        }
+
+        // 渲染当前题目
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            progressText.textContent = `第 ${currentQuestionIndex + 1} / ${questions.length} 题`;
+            questionText.textContent = q.text;
+
+            optionsContainer.innerHTML = '';
+            selectedOptionIndex = null;
+
+            const savedResult = answers[currentQuestionIndex];
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.classList.add('option-btn');
+                btn.setAttribute('data-option-index', idx);
+
+                const prefixSpan = document.createElement('span');
+                prefixSpan.classList.add('option-prefix');
+                prefixSpan.textContent = String.fromCharCode(65 + idx);
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = opt.text;
+
+                btn.appendChild(prefixSpan);
+                btn.appendChild(textSpan);
+
+                // 如果该题已有保存结果，高亮对应选项
+                if (savedResult !== null && opt.result === savedResult) {
+                    btn.classList.add('selected');
+                    selectedOptionIndex = idx;
+                }
+
+                btn.addEventListener('click', () => {
+                    clearSelectedStyles();
+                    btn.classList.add('selected');
+                    selectedOptionIndex = idx;
+                    answers[currentQuestionIndex] = opt.result;
+                    updateNextButtonState();
+                });
+
+                optionsContainer.appendChild(btn);
+            });
+
+            if (answers[currentQuestionIndex] !== null && selectedOptionIndex !== null) {
+                nextBtn.disabled = false;
+            } else {
+                nextBtn.disabled = true;
+            }
+
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = '查看结果';
+            } else {
+                nextBtn.textContent = '下一题';
+            }
+        }
+
+        function startQuiz() {
+            resetState();
+            showScreen('quiz');
+            currentQuestionIndex = 0;
+            selectedOptionIndex = null;
+            answers = new Array(questions.length).fill(null);
+            renderQuestion();
+        }
+
+        // 下一题 / 查看结果
+        function goToNext() {
+            if (selectedOptionIndex === null) return;
+
+            const currentQ = questions[currentQuestionIndex];
+            answers[currentQuestionIndex] = currentQ.options[selectedOptionIndex].result;
+
+            // 最后一题 -> 计算结果
+            if (currentQuestionIndex === questions.length - 1) {
+                // 以最后一题选择为准
+                const finalResult = answers[questions.length - 1] || "奶龙";
+                const result = resultMap[finalResult] || resultMap["奶龙"];
+
+                resultEmoji.textContent = result.emoji;
+                resultTitle.textContent = result.title;
+                resultDesc.textContent = result.desc;
+
+                showScreen('result');
+                return;
+            }
+
+            currentQuestionIndex++;
+            selectedOptionIndex = null;
+            renderQuestion();
+        }
+
+        // ---------- 事件绑定 ----------
+        startBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', goToNext);
+        restartBtn.addEventListener('click', () => {
+            resetState();
+            showScreen('start');
+        });
+    })();
+</script>
+</body>
+</html>
